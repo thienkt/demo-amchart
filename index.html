@@ -1,0 +1,761 @@
+<html>
+  <head>
+    <script
+      defer=""
+      data-domain="cyan-jeniece-38.tiiny.site"
+      src="https://analytics.tiiny.site/js/plausible.js"
+    ></script>
+    <style>
+      #chartdiv {
+        width: 100%;
+        height: 500px;
+      }
+    </style>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script>
+      am5.ready(function () {
+        // Create root element
+        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+        var root = am5.Root.new("chartdiv");
+
+        // Set themes
+        // https://www.amcharts.com/docs/v5/concepts/themes/
+        root.setThemes([am5themes_Animated.new(root)]);
+
+        // Create chart
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/
+        var chart = root.container.children.push(
+          am5xy.XYChart.new(root, {
+            panX: true,
+            panY: false,
+            wheelX: "panX",
+            wheelY: "zoomX",
+            paddingTop: 50,
+            paddingLeft: 0,
+            layout: root.verticalLayout,
+          })
+        );
+
+        chart.root._logo.dispose(); // remove AmCharts logo
+
+        window.chart = chart;
+
+        // Add legend
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        var legend = chart.children.push(
+          am5.Legend.new(root, {
+            centerX: am5.p50,
+            x: am5.p50,
+            y: 0,
+            clickTarget: "none", //disable toggling
+          })
+        );
+
+        var data = [
+          { pair: "ADA/BUSC", short: 300000, long: 400000 },
+          { pair: "ADA/BUSD", short: 300000, long: 400000 },
+          { pair: "ADA/USDC", short: 700000, long: 1000000 },
+          { pair: "ADA/USDT", short: 700000, long: 1000000 },
+          { pair: "BCH/HUSC", short: 200000, long: 600000 },
+          { pair: "BCH/HUSD", short: 200000, long: 600000 },
+          { pair: "BCH/PAC", short: 700000, long: 900000 },
+          { pair: "BCH/PAX", short: 700000, long: 900000 },
+          { pair: "BCH/USDC", short: 500000, long: 900000 },
+          { pair: "BCH/USDT", short: 900000, long: 300000 },
+          { pair: "BNB/BUSC", short: 500000, long: 100000 },
+          { pair: "BNB/BUSD", short: 500000, long: 100000 },
+          { pair: "BNB/USDC", short: 500000, long: 900000 },
+          { pair: "BNB/USDT", short: 500000, long: 900000 },
+          { pair: "BSV/HUSC", short: 900000, long: 400000 },
+          { pair: "BSV/HUSD", short: 900000, long: 400000 },
+          { pair: "BSV/PAC", short: 500000, long: 100000 },
+          { pair: "BSV/PAX", short: 500000, long: 100000 },
+          { pair: "BSV/USDC", short: 200000, long: 500000 },
+          { pair: "BSV/USDC", short: 300000, long: 800000 },
+          { pair: "BSV/USDT", short: 200000, long: 500000 },
+          { pair: "BTC/BUSC", short: 700000, long: 800000 },
+          { pair: "BTC/BUSD", short: 700000, long: 800000 },
+          { pair: "BTC/USDC", short: 100000, long: 400000 },
+          { pair: "BTC/USDT", short: 100000, long: 400000 },
+          { pair: "BUSD/HUSC", short: 900000, long: 400000 },
+          { pair: "BUSD/HUSD", short: 900000, long: 400000 },
+          { pair: "BUSD/PAC", short: 500000, long: 100000 },
+          { pair: "BUSD/PAX", short: 500000, long: 100000 },
+          { pair: "BUSD/USDC", short: 400000, long: 300000 },
+          { pair: "BUSD/USDT", short: 700000, long: 100000 },
+          { pair: "DASH/HUSC", short: 200000, long: 300000 },
+          { pair: "DASH/HUSD", short: 200000, long: 300000 },
+          { pair: "DASH/PAC", short: 100000, long: 900000 },
+          { pair: "DASH/PAX", short: 100000, long: 900000 },
+          { pair: "DASH/USDC", short: 800000, long: 700000 },
+          { pair: "DASH/USDT", short: 900000, long: 300000 },
+          { pair: "DOGE/HUSC", short: 800000, long: 700000 },
+          { pair: "DOGE/HUSD", short: 800000, long: 700000 },
+          { pair: "DOGE/PAC", short: 600000, long: 200000 },
+          { pair: "DOGE/PAX", short: 600000, long: 200000 },
+          { pair: "DOGE/USDC", short: 700000, long: 400000 },
+          { pair: "DOGE/USDT", short: 700000, long: 400000 },
+          { pair: "DYDX/USDC", short: 800000, long: 300000 },
+          { pair: "DYDX/USDT", short: 800000, long: 300000 },
+          { pair: "EOS/BUSC", short: 900000, long: 500000 },
+          { pair: "EOS/BUSD", short: 900000, long: 500000 },
+          { pair: "EOS/HUSC", short: 100000, long: 900000 },
+          { pair: "EOS/HUSD", short: 100000, long: 900000 },
+          { pair: "EOS/PAC", short: 800000, long: 700000 },
+          { pair: "EOS/PAX", short: 800000, long: 700000 },
+          { pair: "EOS/USDC", short: 600000, long: 800000 },
+          { pair: "EOS/USDT", short: 600000, long: 800000 },
+          { pair: "ETC/HUSC", short: 100000, long: 500000 },
+          { pair: "ETC/HUSD", short: 100000, long: 500000 },
+          { pair: "ETC/PAC", short: 300000, long: 400000 },
+          { pair: "ETC/PAX", short: 300000, long: 400000 },
+          { pair: "ETC/USDC", short: 100000, long: 100000 },
+          { pair: "ETC/USDT", short: 100000, long: 100000 },
+          { pair: "ETH/BUSC", short: 200000, long: 900000 },
+          { pair: "ETH/BUSD", short: 200000, long: 900000 },
+          { pair: "ETH/USDC", short: 200000, long: 600000 },
+          { pair: "ETH/USDT", short: 200000, long: 600000 },
+          { pair: "HUSD/HUSC", short: 200000, long: 600000 },
+          { pair: "HUSD/HUSD", short: 200000, long: 600000 },
+          { pair: "HUSD/PAC", short: 700000, long: 900000 },
+          { pair: "HUSD/PAX", short: 700000, long: 900000 },
+          { pair: "HUSD/USDC", short: 200000, long: 600000 },
+          { pair: "HUSD/USDT", short: 200000, long: 600000 },
+          { pair: "LTC/BUSC", short: 600000, long: 300000 },
+          { pair: "LTC/BUSD", short: 600000, long: 300000 },
+          { pair: "LTC/HUSC", short: 400000, long: 300000 },
+          { pair: "LTC/HUSD", short: 400000, long: 300000 },
+          { pair: "LTC/PAC", short: 200000, long: 300000 },
+          { pair: "LTC/PAX", short: 200000, long: 300000 },
+          { pair: "LTC/USDC", short: 500000, long: 600000 },
+          { pair: "LTC/USDT", short: 500000, long: 600000 },
+          { pair: "NEO/HUSC", short: 500000, long: 100000 },
+          { pair: "NEO/HUSD", short: 500000, long: 100000 },
+          { pair: "NEO/PAC", short: 400000, long: 300000 },
+          { pair: "NEO/PAX", short: 400000, long: 300000 },
+          { pair: "NEO/USDC", short: 200000, long: 300000 },
+          { pair: "NEO/USDT", short: 400000, long: 500000 },
+          { pair: "ONT/HUSC", short: 700000, long: 900000 },
+          { pair: "ONT/HUSD", short: 700000, long: 900000 },
+          { pair: "ONT/PAC", short: 800000, long: 500000 },
+          { pair: "ONT/PAX", short: 800000, long: 500000 },
+          { pair: "ONT/USDC", short: 200000, long: 800000 },
+          { pair: "ONT/USDT", short: 200000, long: 800000 },
+          { pair: "PAX/HUSC", short: 400000, long: 300000 },
+          { pair: "PAX/HUSD", short: 400000, long: 300000 },
+          { pair: "PAX/PAC", short: 200000, long: 300000 },
+          { pair: "PAX/PAX", short: 200000, long: 300000 },
+          { pair: "PAX/USDC", short: 100000, long: 900000 },
+          { pair: "PAX/USDT", short: 300000, long: 900000 },
+          { pair: "QTUM/HUSC", short: 300000, long: 400000 },
+          { pair: "QTUM/HUSD", short: 300000, long: 400000 },
+          { pair: "QTUM/PAC", short: 200000, long: 600000 },
+          { pair: "QTUM/PAX", short: 200000, long: 600000 },
+          { pair: "QTUM/USDC", short: 100000, long: 600000 },
+          { pair: "QTUM/USDT", short: 100000, long: 600000 },
+          { pair: "THETA/HUSC", short: 700000, long: 800000 },
+          { pair: "THETA/HUSD", short: 700000, long: 800000 },
+          { pair: "THETA/PAC", short: 100000, long: 500000 },
+          { pair: "THETA/PAX", short: 100000, long: 500000 },
+          { pair: "THETA/USDC", short: 300000, long: 400000 },
+          { pair: "THETA/USDT", short: 900000, long: 200000 },
+          { pair: "TRX/BUSC", short: 900000, long: 600000 },
+          { pair: "TRX/BUSD", short: 900000, long: 600000 },
+          { pair: "TRX/USDC", short: 900000, long: 500000 },
+          { pair: "TRX/USDT", short: 900000, long: 500000 },
+          { pair: "TUSD/HUSC", short: 100000, long: 900000 },
+          { pair: "TUSD/HUSD", short: 100000, long: 900000 },
+          { pair: "TUSD/PAC", short: 800000, long: 700000 },
+          { pair: "TUSD/PAX", short: 800000, long: 700000 },
+          { pair: "TUSD/USDC", short: 600000, long: 200000 },
+          { pair: "TUSD/USDT", short: 600000, long: 400000 },
+          { pair: "USDC/HUSC", short: 800000, long: 500000 },
+          { pair: "USDC/HUSD", short: 800000, long: 500000 },
+          { pair: "USDC/PAC", short: 400000, long: 600000 },
+          { pair: "USDC/PAX", short: 400000, long: 600000 },
+          { pair: "USDC/USDT", short: 500000, long: 700000 },
+          { pair: "USDT/HUSC", short: 100000, long: 500000 },
+          { pair: "USDT/HUSD", short: 100000, long: 500000 },
+          { pair: "USDT/PAC", short: 300000, long: 400000 },
+          { pair: "USDT/PAX", short: 300000, long: 400000 },
+          { pair: "USDT/USDC", short: 200000, long: 600000 },
+          { pair: "USDT/USDT", short: 500000, long: 400000 },
+          { pair: "VET/HUSC", short: 600000, long: 200000 },
+          { pair: "VET/HUSD", short: 600000, long: 200000 },
+          { pair: "VET/PAC", short: 900000, long: 400000 },
+          { pair: "VET/PAX", short: 900000, long: 400000 },
+          { pair: "VET/USDC", short: 500000, long: 100000 },
+          { pair: "VET/USDT", short: 700000, long: 300000 },
+          { pair: "XLM/BUSC", short: 400000, long: 900000 },
+          { pair: "XLM/BUSD", short: 400000, long: 900000 },
+          { pair: "XLM/HUSC", short: 700000, long: 800000 },
+          { pair: "XLM/HUSD", short: 700000, long: 800000 },
+          { pair: "XLM/PAC", short: 100000, long: 500000 },
+          { pair: "XLM/PAX", short: 100000, long: 500000 },
+          { pair: "XLM/USDC", short: 100000, long: 700000 },
+          { pair: "XLM/USDT", short: 300000, long: 200000 },
+          { pair: "XMR/BUSC", short: 100000, long: 200000 },
+          { pair: "XMR/BUSD", short: 100000, long: 200000 },
+          { pair: "XMR/HUSC", short: 800000, long: 500000 },
+          { pair: "XMR/HUSD", short: 800000, long: 500000 },
+          { pair: "XMR/PAC", short: 400000, long: 600000 },
+          { pair: "XMR/PAX", short: 400000, long: 600000 },
+          { pair: "XMR/USDC", short: 400000, long: 100000 },
+          { pair: "XMR/USDT", short: 400000, long: 100000 },
+          { pair: "XRP/BUSC", short: 800000, long: 600000 },
+          { pair: "XRP/BUSD", short: 800000, long: 600000 },
+          { pair: "XRP/HUSC", short: 600000, long: 200000 },
+          { pair: "XRP/HUSD", short: 600000, long: 200000 },
+          { pair: "XRP/PAC", short: 900000, long: 400000 },
+          { pair: "XRP/PAX", short: 900000, long: 400000 },
+          { pair: "XRP/USDC", short: 1000000, long: 700000 },
+          { pair: "XRP/USDT", short: 1000000, long: 700000 },
+          { pair: "ZEC/HUSC", short: 400000, long: 600000 },
+          { pair: "ZEC/HUSD", short: 400000, long: 600000 },
+          { pair: "ZEC/PAC", short: 700000, long: 800000 },
+          { pair: "ZEC/PAX", short: 700000, long: 800000 },
+          { pair: "ZEC/USDC", short: 100000, long: 500000 },
+          { pair: "ZEC/USDT", short: 800000, long: 600000 },
+        ];
+
+        // Create axes
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+        var xRenderer = am5xy.AxisRendererX.new(root, {
+          cellStartLocation: 0.2,
+          cellEndLocation: 0.8,
+          minorGridEnabled: true,
+        });
+
+        var xAxis = chart.xAxes.push(
+          am5xy.CategoryAxis.new(root, {
+            categoryField: "pair",
+            renderer: xRenderer,
+            tooltip: am5.Tooltip.new(root, {}),
+          })
+        );
+
+        xRenderer.grid.template.setAll({
+          location: 1,
+        });
+
+        xAxis.data.setAll(data);
+
+        (function rotateXAxesLabels() {
+          const xRenderer = xAxis.get("renderer");
+          xRenderer.set("minGridDistance", 20); // set minimum distance to make labels visible
+          xRenderer.labels.template.setAll({
+            rotation: 90,
+            centerY: am5.p50,
+          });
+        })();
+
+        var yAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            min: 0,
+            max: 2500000, // Set maximum value to stabilize height during zoom operations
+            renderer: am5xy.AxisRendererY.new(root, {
+              strokeOpacity: 0.1,
+            }),
+          })
+        );
+
+        function addAxisTitle() {
+          yAxis.children.unshift(
+            am5.Label.new(root, {
+              text: "(Lot)",
+              y: -40,
+              x: am5.percent(50),
+            })
+          );
+        }
+
+        addAxisTitle();
+
+        // Add series
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+        function makeSeries(name, fieldName, color = 0x2a3f54, stacked = true) {
+          var series = chart.series.push(
+            am5xy.ColumnSeries.new(root, {
+              stacked: stacked,
+              name: name,
+              xAxis: xAxis,
+              yAxis: yAxis,
+              fill: am5.color(color),
+              valueYField: fieldName,
+              categoryXField: "pair",
+            })
+          );
+
+          series.columns.template.setAll({
+            tooltipText: "{categoryX}: {name}, {valueY} Lot",
+            width: am5.percent(90),
+            tooltipY: am5.percent(10),
+          });
+          series.data.setAll(data);
+
+          // Make stuff animate on load
+          // https://www.amcharts.com/docs/v5/concepts/animations/
+          series.appear();
+
+          // bullets: the values ​​display in the columns
+          //   series.bullets.push(function () {
+          //     return am5.Bullet.new(root, {
+          //       locationY: 0.5,
+          //       sprite: am5.Label.new(root, {
+          //         text: "{valueY}",
+          //         fill: root.interfaceColors.get("alternativeText"),
+          //         centerY: am5.percent(50),
+          //         centerX: am5.percent(50),
+          //         populateText: true,
+          //       }),
+          //     });
+          //   });
+
+          legend.data.push(series);
+        }
+
+        makeSeries("Long", "long", 0x88a6c4);
+        makeSeries("Short", "short");
+
+        function addScrollBar() {
+          // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+          const scrollbarX = am5.Scrollbar.new(root, {
+            orientation: "horizontal",
+          });
+
+          chart.set("scrollbarX", scrollbarX);
+          chart.bottomAxesContainer.children.push(scrollbarX);
+        }
+
+        function customScrollbar() {
+          let scrollbarX = chart.get("scrollbarX");
+
+          scrollbarX.thumb.setAll({
+            fill: am5.color(0xe5e5e5),
+          });
+
+          scrollbarX.startGrip.setAll({
+            visible: false,
+          });
+
+          scrollbarX.endGrip.setAll({
+            visible: false,
+          });
+        }
+
+        addScrollBar();
+        customScrollbar();
+
+        // =================================================================
+
+        // =================================================================
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        chart.appear(1000, 100);
+      }); // end am5.ready()
+    </script>
+    <script>
+      am5.ready(function () {
+        // Create root element
+        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+        var root = am5.Root.new("chartdiv2");
+
+        // Set themes
+        // https://www.amcharts.com/docs/v5/concepts/themes/
+        root.setThemes([am5themes_Animated.new(root)]);
+
+        // Create chart
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/
+        var chart = root.container.children.push(
+          am5xy.XYChart.new(root, {
+            panX: true,
+            panY: false,
+            wheelX: "panX",
+            wheelY: "zoomX",
+            paddingTop: 50,
+            paddingLeft: 0,
+            layout: root.verticalLayout,
+          })
+        );
+
+        chart.root._logo.dispose(); // remove AmCharts logo
+
+        window.chart = chart;
+
+        // Add legend
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        var legend = chart.children.push(
+          am5.Legend.new(root, {
+            centerX: am5.p50,
+            x: am5.p50,
+            y: 0,
+            clickTarget: "none", //disable toggling
+          })
+        );
+        const generateSampleDate = (index) => {
+          // Generate a day and month based on the index for variety
+          function indexToDate(index, year) {
+            // Create a date object starting from January 1 of the specified year
+            let date = new Date(year, 0, 1);
+            // Add the index as days to that date
+            date.setDate(date.getDate() + index);
+
+            // Format the output as DD/MM
+            let day = String(date.getDate()).padStart(2, "0");
+            let month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+
+            return `${day}/${month}`;
+          }
+
+          return indexToDate(index, 2024);
+        };
+        var data = [
+          { short: 300000, long: 400000 },
+          { short: 300000, long: 400000 },
+          { short: 700000, long: 1000000 },
+          { short: 700000, long: 1000000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 700000, long: 900000 },
+          { short: 700000, long: 900000 },
+          { short: 500000, long: 900000 },
+          { short: 900000, long: 300000 },
+          { short: 500000, long: 100000 },
+          { short: 500000, long: 100000 },
+          { short: 500000, long: 900000 },
+          { short: 500000, long: 900000 },
+          { short: 900000, long: 400000 },
+          { short: 900000, long: 400000 },
+          { short: 500000, long: 100000 },
+          { short: 500000, long: 100000 },
+          { short: 200000, long: 500000 },
+          { short: 300000, long: 800000 },
+          { short: 200000, long: 500000 },
+          { short: 700000, long: 800000 },
+          { short: 700000, long: 800000 },
+          { short: 100000, long: 400000 },
+          { short: 100000, long: 400000 },
+          { short: 900000, long: 400000 },
+          { short: 900000, long: 400000 },
+          { short: 500000, long: 100000 },
+          { short: 500000, long: 100000 },
+          { short: 400000, long: 300000 },
+          { short: 700000, long: 100000 },
+          { short: 200000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 100000, long: 900000 },
+          { short: 100000, long: 900000 },
+          { short: 800000, long: 700000 },
+          { short: 900000, long: 300000 },
+          { short: 800000, long: 700000 },
+          { short: 800000, long: 700000 },
+          { short: 600000, long: 200000 },
+          { short: 600000, long: 200000 },
+          { short: 700000, long: 400000 },
+          { short: 700000, long: 400000 },
+          { short: 800000, long: 300000 },
+          { short: 800000, long: 300000 },
+          { short: 900000, long: 500000 },
+          { short: 900000, long: 500000 },
+          { short: 100000, long: 900000 },
+          { short: 100000, long: 900000 },
+          { short: 800000, long: 700000 },
+          { short: 800000, long: 700000 },
+          { short: 600000, long: 800000 },
+          { short: 600000, long: 800000 },
+          { short: 100000, long: 500000 },
+          { short: 100000, long: 500000 },
+          { short: 300000, long: 400000 },
+          { short: 300000, long: 400000 },
+          { short: 100000, long: 100000 },
+          { short: 100000, long: 100000 },
+          { short: 200000, long: 900000 },
+          { short: 200000, long: 900000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 700000, long: 900000 },
+          { short: 700000, long: 900000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 600000, long: 300000 },
+          { short: 600000, long: 300000 },
+          { short: 400000, long: 300000 },
+          { short: 400000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 500000, long: 600000 },
+          { short: 500000, long: 600000 },
+          { short: 500000, long: 100000 },
+          { short: 500000, long: 100000 },
+          { short: 400000, long: 300000 },
+          { short: 400000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 400000, long: 500000 },
+          { short: 700000, long: 900000 },
+          { short: 700000, long: 900000 },
+          { short: 800000, long: 500000 },
+          { short: 800000, long: 500000 },
+          { short: 200000, long: 800000 },
+          { short: 200000, long: 800000 },
+          { short: 400000, long: 300000 },
+          { short: 400000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 200000, long: 300000 },
+          { short: 100000, long: 900000 },
+          { short: 300000, long: 900000 },
+          { short: 300000, long: 400000 },
+          { short: 300000, long: 400000 },
+          { short: 200000, long: 600000 },
+          { short: 200000, long: 600000 },
+          { short: 100000, long: 600000 },
+          { short: 100000, long: 600000 },
+          { short: 700000, long: 800000 },
+          { short: 700000, long: 800000 },
+          { short: 100000, long: 500000 },
+          { short: 100000, long: 500000 },
+          { short: 300000, long: 400000 },
+          { short: 900000, long: 200000 },
+          { short: 900000, long: 600000 },
+          { short: 900000, long: 600000 },
+          { short: 900000, long: 500000 },
+          { short: 900000, long: 500000 },
+          { short: 100000, long: 900000 },
+          { short: 100000, long: 900000 },
+          { short: 800000, long: 700000 },
+          { short: 800000, long: 700000 },
+          { short: 600000, long: 200000 },
+          { short: 600000, long: 400000 },
+          { short: 800000, long: 500000 },
+          { short: 800000, long: 500000 },
+          { short: 400000, long: 600000 },
+          { short: 400000, long: 600000 },
+          { short: 500000, long: 700000 },
+          { short: 100000, long: 500000 },
+          { short: 100000, long: 500000 },
+          { short: 300000, long: 400000 },
+          { short: 300000, long: 400000 },
+          { short: 200000, long: 600000 },
+          { short: 500000, long: 400000 },
+          { short: 600000, long: 200000 },
+          { short: 600000, long: 200000 },
+          { short: 900000, long: 400000 },
+          { short: 900000, long: 400000 },
+          { short: 500000, long: 100000 },
+          { short: 700000, long: 300000 },
+          { short: 400000, long: 900000 },
+          { short: 400000, long: 900000 },
+          { short: 700000, long: 800000 },
+          { short: 700000, long: 800000 },
+          { short: 100000, long: 500000 },
+          { short: 100000, long: 500000 },
+          { short: 100000, long: 700000 },
+          { short: 300000, long: 200000 },
+          { short: 100000, long: 200000 },
+          { short: 100000, long: 200000 },
+          { short: 800000, long: 500000 },
+          { short: 800000, long: 500000 },
+          { short: 400000, long: 600000 },
+          { short: 400000, long: 600000 },
+          { short: 400000, long: 100000 },
+          { short: 400000, long: 100000 },
+          { short: 800000, long: 600000 },
+          { short: 800000, long: 600000 },
+          { short: 600000, long: 200000 },
+          { short: 600000, long: 200000 },
+          { short: 900000, long: 400000 },
+          { short: 900000, long: 400000 },
+          { short: 1000000, long: 700000 },
+          { short: 1000000, long: 700000 },
+          { short: 400000, long: 600000 },
+          { short: 400000, long: 600000 },
+          { short: 700000, long: 800000 },
+          { short: 700000, long: 800000 },
+          { short: 100000, long: 500000 },
+          { short: 800000, long: 600000 },
+        ];
+        data = [...data, ...data]
+          .map((entry, index) => {
+            return {
+              date: generateSampleDate(index),
+              short: entry.short,
+              long: entry.long,
+            };
+          })
+          .sort((a, b) => {
+            const [dayA, monthA] = a.date.split("/").map(Number);
+            const [dayB, monthB] = b.date.split("/").map(Number);
+            return monthA - monthB || dayA - dayB;
+          });
+
+        const uniqueData = [];
+        const datesSet = new Set();
+
+        data.forEach((entry) => {
+          if (!datesSet.has(entry.date)) {
+            datesSet.add(entry.date);
+            uniqueData.push(entry);
+          }
+        });
+
+        data = [...uniqueData];
+        console.log(data.length);
+
+        // Create axes
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+        var xRenderer = am5xy.AxisRendererX.new(root, {
+          cellStartLocation: 0.2,
+          cellEndLocation: 0.8,
+          minorGridEnabled: true,
+        });
+
+        var xAxis = chart.xAxes.push(
+          am5xy.CategoryAxis.new(root, {
+            categoryField: "date",
+            renderer: xRenderer,
+            tooltip: am5.Tooltip.new(root, {}),
+          })
+        );
+
+        xRenderer.grid.template.setAll({
+          location: 1,
+        });
+
+        xAxis.data.setAll(data);
+
+        (function rotateXAxesLabels() {
+          const xRenderer = xAxis.get("renderer");
+          // xRenderer.set("minGridDistance", 20); // set minimum distance to make labels visible
+          xRenderer.labels.template.setAll({
+            rotation: 0,
+            centerY: am5.p50,
+          });
+        })();
+
+        var yAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            min: 0,
+            max: 2500000, // Set maximum value to stabilize height during zoom operations
+            renderer: am5xy.AxisRendererY.new(root, {
+              strokeOpacity: 0.1,
+            }),
+          })
+        );
+
+        function addAxisTitle() {
+          yAxis.children.unshift(
+            am5.Label.new(root, {
+              text: "(Lot)",
+              y: -40,
+              x: am5.percent(50),
+            })
+          );
+        }
+
+        // addAxisTitle();
+
+        // Add series
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+        function makeSeries(name, fieldName, color = 0x2a3f54, stacked = true) {
+          var series = chart.series.push(
+            am5xy.ColumnSeries.new(root, {
+              stacked: stacked,
+              name: name,
+              xAxis: xAxis,
+              yAxis: yAxis,
+              fill: am5.color(color),
+              valueYField: fieldName,
+              categoryXField: "date",
+            })
+          );
+
+          series.columns.template.setAll({
+            tooltipText: "{categoryX}: {name}, {valueY}",
+            width: am5.percent(90),
+            tooltipY: am5.percent(10),
+          });
+          series.data.setAll(data);
+
+          // Make stuff animate on load
+          // https://www.amcharts.com/docs/v5/concepts/animations/
+          series.appear();
+
+          // bullets: the values ​​display in the columns
+          //   series.bullets.push(function () {
+          //     return am5.Bullet.new(root, {
+          //       locationY: 0.5,
+          //       sprite: am5.Label.new(root, {
+          //         text: "{valueY}",
+          //         fill: root.interfaceColors.get("alternativeText"),
+          //         centerY: am5.percent(50),
+          //         centerX: am5.percent(50),
+          //         populateText: true,
+          //       }),
+          //     });
+          //   });
+
+          legend.data.push(series);
+        }
+
+        makeSeries("New", "long", 0x88a6c4);
+        makeSeries("Additional", "short");
+
+        function addScrollBar() {
+          // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+          const scrollbarX = am5.Scrollbar.new(root, {
+            orientation: "horizontal",
+          });
+
+          chart.set("scrollbarX", scrollbarX);
+          chart.bottomAxesContainer.children.push(scrollbarX);
+        }
+
+        function customScrollbar() {
+          let scrollbarX = chart.get("scrollbarX");
+
+          scrollbarX.thumb.setAll({
+            fill: am5.color(0xe5e5e5),
+          });
+
+          scrollbarX.startGrip.setAll({
+            visible: false,
+          });
+
+          scrollbarX.endGrip.setAll({
+            visible: false,
+          });
+        }
+
+        addScrollBar();
+        customScrollbar();
+
+        // =================================================================
+
+        // =================================================================
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        chart.appear(1000, 100);
+      }); // end am5.ready()
+    </script></head
+  ><!-- Styles -->
+
+  <!-- Resources -->
+
+  <!-- Chart code -->
+
+  <!-- Chart code 2 -->
+
+  <!-- HTML -->
+  <body>
+    <div id="chartdiv" style="max-width: 70vw; margin: auto"></div>
+    <div
+      id="chartdiv2"
+      style="max-width: 70vw; max-height: 40vh; margin: auto"
+    ></div>
+  </body>
+</html>
