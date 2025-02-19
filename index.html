@@ -1,761 +1,837 @@
-<html>
-  <head>
-    <script
-      defer=""
-      data-domain="cyan-jeniece-38.tiiny.site"
-      src="https://analytics.tiiny.site/js/plausible.js"
-    ></script>
-    <style>
-      #chartdiv {
-        width: 100%;
-        height: 500px;
+<!-- Styles -->
+<style>
+  .wrapper,
+  .cluster-wrapper {
+    width: 1186px;
+    height: 624px;
+    margin: 40px auto;
+    background-color: #f6f6f6;
+    padding: 16px;
+  }
+
+  .cluster-wrapper {
+    width: 829px;
+    height: 1379px;
+  }
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<!-- Chart code -->
+<script>
+
+  am5.ready(function () {
+
+
+    // Create root element
+    // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+    var root = am5.Root.new("cluster");
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root.setThemes([
+      am5themes_Animated.new(root)
+    ]);
+
+    // Create wrapper for charts
+    var container = root.container.children.push(am5.Container.new(root, {
+      width: am5.p100,
+      height: am5.p100,
+      layout: root.horizontalLayout,
+    }));
+
+    {
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = container.children.push(
+        am5xy.XYChart.new(root, {
+          width: am5.p50,
+          height: am5.p100,
+          panX: true,
+          panY: false,
+          wheelX: "zoomX",
+          wheelY: "zoomX",
+          layout: root.verticalLayout,
+          arrangeTooltips: false,
+          paddingLeft: 0,
+          paddingRight: 40
+        })
+      );
+
+      // Set plot container background color
+      chart.plotContainer.set("background", am5.Rectangle.new(root, {
+        fill: am5.color("#fff") // Set the grid background color here
+      }));
+
+      // Use only absolute numbers
+      chart.getNumberFormatter().set("numberFormat", "#.#s");
+
+      // Add legend
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+      var legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.p50,
+          x: am5.p50
+        })
+      );
+
+      // Data
+      var data = getData().reverse();
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var yAxis = chart.yAxes.push(
+        am5xy.CategoryAxis.new(root, {
+          categoryField: "range",
+          renderer: am5xy.AxisRendererY.new(root, {
+            inversed: true,
+            cellStartLocation: 0.1,
+            cellEndLocation: 0.9,
+            minorGridEnabled: true,
+            minGridDistance: 20
+          }),
+          paddingRight: 10 // Add padding to the right here
+        })
+      );
+
+      yAxis.get("renderer").labels.template.setAll({
+        fontSize: "14px", // Set the font size here
+        fill: am5.color("#606060") // Set the label color here
+      });
+
+      yAxis.data.setAll(data);
+
+      var xAxis = chart.xAxes.push(
+        am5xy.ValueAxis.new(root, {
+          renderer: am5xy.AxisRendererX.new(root, {
+            minGridDistance: 60,
+            strokeOpacity: 0.1
+          })
+        })
+      );
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function createSeries(field, labelCenterX, pointerOrientation, rangeValue, color = "#ea7e33") {
+        var series = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueXField: field,
+            categoryYField: "range",
+            sequencedInterpolation: true,
+            clustered: false,
+            fill: am5.color(color),
+          })
+        );
+
+        series.columns.template.setAll({
+          height: am5.p100,
+          strokeOpacity: 0,
+          fillOpacity: 0.8
+        });
+
+        series.bullets.push(function () {
+          return am5.Bullet.new(root, {
+            locationX: 1,
+            locationY: 0.5,
+            sprite: am5.Label.new(root, {
+              centerY: am5.p50,
+              text: "{valueX}",
+              populateText: true,
+              centerX: labelCenterX
+            })
+          });
+        });
+
+        series.data.setAll(data);
+        series.appear();
+
+        var rangeDataItem = xAxis.makeDataItem({
+          value: rangeValue
+        });
+        xAxis.createAxisRange(rangeDataItem);
+        rangeDataItem.get("grid").setAll({
+          strokeOpacity: 1,
+          stroke: series.get("stroke")
+        });
+
+        return series;
       }
-    </style>
-    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-    <script>
-      am5.ready(function () {
-        // Create root element
-        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-        var root = am5.Root.new("chartdiv");
 
-        // Set themes
-        // https://www.amcharts.com/docs/v5/concepts/themes/
-        root.setThemes([am5themes_Animated.new(root)]);
+      createSeries("payin", am5.p100, "right", -3, "#01678a");
+      createSeries("payout", 0, "left", 4, "#ea7e33");
 
-        // Create chart
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/
-        var chart = root.container.children.push(
-          am5xy.XYChart.new(root, {
-            panX: true,
-            panY: false,
-            wheelX: "panX",
-            wheelY: "zoomX",
-            paddingTop: 50,
-            paddingLeft: 0,
-            layout: root.verticalLayout,
+      // // Add cursor
+      // // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      // var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      //   behavior: "zoomY"
+      // }));
+      // cursor.lineY.set("forceHidden", true);
+      // cursor.lineX.set("forceHidden", true);
+
+      chart.root._logo.dispose();
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+    }
+   }); // end am5.ready()
+</script>
+
+
+<script>
+
+  am5.ready(function () {
+
+
+    // Create root element
+    // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+    var root = am5.Root.new("chartdiv");
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root.setThemes([
+      am5themes_Animated.new(root)
+    ]);
+
+    // Create wrapper for charts
+    var container = root.container.children.push(am5.Container.new(root, {
+      width: am5.p100,
+      height: am5.p100,
+      layout: root.horizontalLayout,
+    }));
+
+    {
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = container.children.push(
+        am5xy.XYChart.new(root, {
+          width: am5.p50,
+          height: am5.p100,
+          panX: true,
+          panY: false,
+          wheelX: "zoomX",
+          wheelY: "zoomX",
+          layout: root.verticalLayout,
+          arrangeTooltips: false,
+          paddingLeft: 0,
+          paddingRight: 40
+        })
+      );
+
+      // Set plot container background color
+      chart.plotContainer.set("background", am5.Rectangle.new(root, {
+        fill: am5.color("#fff") // Set the grid background color here
+      }));
+
+      // Use only absolute numbers
+      chart.getNumberFormatter().set("numberFormat", "#.#s");
+
+      // Add legend
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+      var legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.p50,
+          x: am5.p50
+        })
+      );
+
+      // Data
+      var data = getData().reverse();
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var yAxis = chart.yAxes.push(
+        am5xy.CategoryAxis.new(root, {
+          categoryField: "range",
+          renderer: am5xy.AxisRendererY.new(root, {
+            inversed: true,
+            cellStartLocation: 0.1,
+            cellEndLocation: 0.9,
+            minorGridEnabled: true,
+            minGridDistance: 20
+          }),
+          paddingRight: 10 // Add padding to the right here
+        })
+      );
+
+      yAxis.get("renderer").labels.template.setAll({
+        fontSize: "14px", // Set the font size here
+        fill: am5.color("#606060") // Set the label color here
+      });
+
+      yAxis.data.setAll(data);
+
+      var xAxis = chart.xAxes.push(
+        am5xy.ValueAxis.new(root, {
+          renderer: am5xy.AxisRendererX.new(root, {
+            minGridDistance: 60,
+            strokeOpacity: 0.1
+          })
+        })
+      );
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function createSeries(field, labelCenterX, pointerOrientation, rangeValue, color = "#ea7e33") {
+        var series = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueXField: field,
+            categoryYField: "range",
+            sequencedInterpolation: true,
+            clustered: false,
+            fill: am5.color(color),
           })
         );
 
-        chart.root._logo.dispose(); // remove AmCharts logo
+        series.columns.template.setAll({
+          height: am5.p100,
+          strokeOpacity: 0,
+          fillOpacity: 0.8
+        });
 
-        window.chart = chart;
+        series.bullets.push(function () {
+          return am5.Bullet.new(root, {
+            locationX: 1,
+            locationY: 0.5,
+            sprite: am5.Label.new(root, {
+              centerY: am5.p50,
+              text: "{valueX}",
+              populateText: true,
+              centerX: labelCenterX
+            })
+          });
+        });
 
-        // Add legend
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-        var legend = chart.children.push(
-          am5.Legend.new(root, {
-            centerX: am5.p50,
-            x: am5.p50,
-            y: 0,
-            clickTarget: "none", //disable toggling
-          })
-        );
+        series.data.setAll(data);
+        series.appear();
 
-        var data = [
-          { pair: "ADA/BUSC", short: 300000, long: 400000 },
-          { pair: "ADA/BUSD", short: 300000, long: 400000 },
-          { pair: "ADA/USDC", short: 700000, long: 1000000 },
-          { pair: "ADA/USDT", short: 700000, long: 1000000 },
-          { pair: "BCH/HUSC", short: 200000, long: 600000 },
-          { pair: "BCH/HUSD", short: 200000, long: 600000 },
-          { pair: "BCH/PAC", short: 700000, long: 900000 },
-          { pair: "BCH/PAX", short: 700000, long: 900000 },
-          { pair: "BCH/USDC", short: 500000, long: 900000 },
-          { pair: "BCH/USDT", short: 900000, long: 300000 },
-          { pair: "BNB/BUSC", short: 500000, long: 100000 },
-          { pair: "BNB/BUSD", short: 500000, long: 100000 },
-          { pair: "BNB/USDC", short: 500000, long: 900000 },
-          { pair: "BNB/USDT", short: 500000, long: 900000 },
-          { pair: "BSV/HUSC", short: 900000, long: 400000 },
-          { pair: "BSV/HUSD", short: 900000, long: 400000 },
-          { pair: "BSV/PAC", short: 500000, long: 100000 },
-          { pair: "BSV/PAX", short: 500000, long: 100000 },
-          { pair: "BSV/USDC", short: 200000, long: 500000 },
-          { pair: "BSV/USDC", short: 300000, long: 800000 },
-          { pair: "BSV/USDT", short: 200000, long: 500000 },
-          { pair: "BTC/BUSC", short: 700000, long: 800000 },
-          { pair: "BTC/BUSD", short: 700000, long: 800000 },
-          { pair: "BTC/USDC", short: 100000, long: 400000 },
-          { pair: "BTC/USDT", short: 100000, long: 400000 },
-          { pair: "BUSD/HUSC", short: 900000, long: 400000 },
-          { pair: "BUSD/HUSD", short: 900000, long: 400000 },
-          { pair: "BUSD/PAC", short: 500000, long: 100000 },
-          { pair: "BUSD/PAX", short: 500000, long: 100000 },
-          { pair: "BUSD/USDC", short: 400000, long: 300000 },
-          { pair: "BUSD/USDT", short: 700000, long: 100000 },
-          { pair: "DASH/HUSC", short: 200000, long: 300000 },
-          { pair: "DASH/HUSD", short: 200000, long: 300000 },
-          { pair: "DASH/PAC", short: 100000, long: 900000 },
-          { pair: "DASH/PAX", short: 100000, long: 900000 },
-          { pair: "DASH/USDC", short: 800000, long: 700000 },
-          { pair: "DASH/USDT", short: 900000, long: 300000 },
-          { pair: "DOGE/HUSC", short: 800000, long: 700000 },
-          { pair: "DOGE/HUSD", short: 800000, long: 700000 },
-          { pair: "DOGE/PAC", short: 600000, long: 200000 },
-          { pair: "DOGE/PAX", short: 600000, long: 200000 },
-          { pair: "DOGE/USDC", short: 700000, long: 400000 },
-          { pair: "DOGE/USDT", short: 700000, long: 400000 },
-          { pair: "DYDX/USDC", short: 800000, long: 300000 },
-          { pair: "DYDX/USDT", short: 800000, long: 300000 },
-          { pair: "EOS/BUSC", short: 900000, long: 500000 },
-          { pair: "EOS/BUSD", short: 900000, long: 500000 },
-          { pair: "EOS/HUSC", short: 100000, long: 900000 },
-          { pair: "EOS/HUSD", short: 100000, long: 900000 },
-          { pair: "EOS/PAC", short: 800000, long: 700000 },
-          { pair: "EOS/PAX", short: 800000, long: 700000 },
-          { pair: "EOS/USDC", short: 600000, long: 800000 },
-          { pair: "EOS/USDT", short: 600000, long: 800000 },
-          { pair: "ETC/HUSC", short: 100000, long: 500000 },
-          { pair: "ETC/HUSD", short: 100000, long: 500000 },
-          { pair: "ETC/PAC", short: 300000, long: 400000 },
-          { pair: "ETC/PAX", short: 300000, long: 400000 },
-          { pair: "ETC/USDC", short: 100000, long: 100000 },
-          { pair: "ETC/USDT", short: 100000, long: 100000 },
-          { pair: "ETH/BUSC", short: 200000, long: 900000 },
-          { pair: "ETH/BUSD", short: 200000, long: 900000 },
-          { pair: "ETH/USDC", short: 200000, long: 600000 },
-          { pair: "ETH/USDT", short: 200000, long: 600000 },
-          { pair: "HUSD/HUSC", short: 200000, long: 600000 },
-          { pair: "HUSD/HUSD", short: 200000, long: 600000 },
-          { pair: "HUSD/PAC", short: 700000, long: 900000 },
-          { pair: "HUSD/PAX", short: 700000, long: 900000 },
-          { pair: "HUSD/USDC", short: 200000, long: 600000 },
-          { pair: "HUSD/USDT", short: 200000, long: 600000 },
-          { pair: "LTC/BUSC", short: 600000, long: 300000 },
-          { pair: "LTC/BUSD", short: 600000, long: 300000 },
-          { pair: "LTC/HUSC", short: 400000, long: 300000 },
-          { pair: "LTC/HUSD", short: 400000, long: 300000 },
-          { pair: "LTC/PAC", short: 200000, long: 300000 },
-          { pair: "LTC/PAX", short: 200000, long: 300000 },
-          { pair: "LTC/USDC", short: 500000, long: 600000 },
-          { pair: "LTC/USDT", short: 500000, long: 600000 },
-          { pair: "NEO/HUSC", short: 500000, long: 100000 },
-          { pair: "NEO/HUSD", short: 500000, long: 100000 },
-          { pair: "NEO/PAC", short: 400000, long: 300000 },
-          { pair: "NEO/PAX", short: 400000, long: 300000 },
-          { pair: "NEO/USDC", short: 200000, long: 300000 },
-          { pair: "NEO/USDT", short: 400000, long: 500000 },
-          { pair: "ONT/HUSC", short: 700000, long: 900000 },
-          { pair: "ONT/HUSD", short: 700000, long: 900000 },
-          { pair: "ONT/PAC", short: 800000, long: 500000 },
-          { pair: "ONT/PAX", short: 800000, long: 500000 },
-          { pair: "ONT/USDC", short: 200000, long: 800000 },
-          { pair: "ONT/USDT", short: 200000, long: 800000 },
-          { pair: "PAX/HUSC", short: 400000, long: 300000 },
-          { pair: "PAX/HUSD", short: 400000, long: 300000 },
-          { pair: "PAX/PAC", short: 200000, long: 300000 },
-          { pair: "PAX/PAX", short: 200000, long: 300000 },
-          { pair: "PAX/USDC", short: 100000, long: 900000 },
-          { pair: "PAX/USDT", short: 300000, long: 900000 },
-          { pair: "QTUM/HUSC", short: 300000, long: 400000 },
-          { pair: "QTUM/HUSD", short: 300000, long: 400000 },
-          { pair: "QTUM/PAC", short: 200000, long: 600000 },
-          { pair: "QTUM/PAX", short: 200000, long: 600000 },
-          { pair: "QTUM/USDC", short: 100000, long: 600000 },
-          { pair: "QTUM/USDT", short: 100000, long: 600000 },
-          { pair: "THETA/HUSC", short: 700000, long: 800000 },
-          { pair: "THETA/HUSD", short: 700000, long: 800000 },
-          { pair: "THETA/PAC", short: 100000, long: 500000 },
-          { pair: "THETA/PAX", short: 100000, long: 500000 },
-          { pair: "THETA/USDC", short: 300000, long: 400000 },
-          { pair: "THETA/USDT", short: 900000, long: 200000 },
-          { pair: "TRX/BUSC", short: 900000, long: 600000 },
-          { pair: "TRX/BUSD", short: 900000, long: 600000 },
-          { pair: "TRX/USDC", short: 900000, long: 500000 },
-          { pair: "TRX/USDT", short: 900000, long: 500000 },
-          { pair: "TUSD/HUSC", short: 100000, long: 900000 },
-          { pair: "TUSD/HUSD", short: 100000, long: 900000 },
-          { pair: "TUSD/PAC", short: 800000, long: 700000 },
-          { pair: "TUSD/PAX", short: 800000, long: 700000 },
-          { pair: "TUSD/USDC", short: 600000, long: 200000 },
-          { pair: "TUSD/USDT", short: 600000, long: 400000 },
-          { pair: "USDC/HUSC", short: 800000, long: 500000 },
-          { pair: "USDC/HUSD", short: 800000, long: 500000 },
-          { pair: "USDC/PAC", short: 400000, long: 600000 },
-          { pair: "USDC/PAX", short: 400000, long: 600000 },
-          { pair: "USDC/USDT", short: 500000, long: 700000 },
-          { pair: "USDT/HUSC", short: 100000, long: 500000 },
-          { pair: "USDT/HUSD", short: 100000, long: 500000 },
-          { pair: "USDT/PAC", short: 300000, long: 400000 },
-          { pair: "USDT/PAX", short: 300000, long: 400000 },
-          { pair: "USDT/USDC", short: 200000, long: 600000 },
-          { pair: "USDT/USDT", short: 500000, long: 400000 },
-          { pair: "VET/HUSC", short: 600000, long: 200000 },
-          { pair: "VET/HUSD", short: 600000, long: 200000 },
-          { pair: "VET/PAC", short: 900000, long: 400000 },
-          { pair: "VET/PAX", short: 900000, long: 400000 },
-          { pair: "VET/USDC", short: 500000, long: 100000 },
-          { pair: "VET/USDT", short: 700000, long: 300000 },
-          { pair: "XLM/BUSC", short: 400000, long: 900000 },
-          { pair: "XLM/BUSD", short: 400000, long: 900000 },
-          { pair: "XLM/HUSC", short: 700000, long: 800000 },
-          { pair: "XLM/HUSD", short: 700000, long: 800000 },
-          { pair: "XLM/PAC", short: 100000, long: 500000 },
-          { pair: "XLM/PAX", short: 100000, long: 500000 },
-          { pair: "XLM/USDC", short: 100000, long: 700000 },
-          { pair: "XLM/USDT", short: 300000, long: 200000 },
-          { pair: "XMR/BUSC", short: 100000, long: 200000 },
-          { pair: "XMR/BUSD", short: 100000, long: 200000 },
-          { pair: "XMR/HUSC", short: 800000, long: 500000 },
-          { pair: "XMR/HUSD", short: 800000, long: 500000 },
-          { pair: "XMR/PAC", short: 400000, long: 600000 },
-          { pair: "XMR/PAX", short: 400000, long: 600000 },
-          { pair: "XMR/USDC", short: 400000, long: 100000 },
-          { pair: "XMR/USDT", short: 400000, long: 100000 },
-          { pair: "XRP/BUSC", short: 800000, long: 600000 },
-          { pair: "XRP/BUSD", short: 800000, long: 600000 },
-          { pair: "XRP/HUSC", short: 600000, long: 200000 },
-          { pair: "XRP/HUSD", short: 600000, long: 200000 },
-          { pair: "XRP/PAC", short: 900000, long: 400000 },
-          { pair: "XRP/PAX", short: 900000, long: 400000 },
-          { pair: "XRP/USDC", short: 1000000, long: 700000 },
-          { pair: "XRP/USDT", short: 1000000, long: 700000 },
-          { pair: "ZEC/HUSC", short: 400000, long: 600000 },
-          { pair: "ZEC/HUSD", short: 400000, long: 600000 },
-          { pair: "ZEC/PAC", short: 700000, long: 800000 },
-          { pair: "ZEC/PAX", short: 700000, long: 800000 },
-          { pair: "ZEC/USDC", short: 100000, long: 500000 },
-          { pair: "ZEC/USDT", short: 800000, long: 600000 },
-        ];
+        var rangeDataItem = xAxis.makeDataItem({
+          value: rangeValue
+        });
+        xAxis.createAxisRange(rangeDataItem);
+        rangeDataItem.get("grid").setAll({
+          strokeOpacity: 1,
+          stroke: series.get("stroke")
+        });
 
-        // Create axes
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-        var xRenderer = am5xy.AxisRendererX.new(root, {
-          cellStartLocation: 0.2,
-          cellEndLocation: 0.8,
+        return series;
+      }
+
+      createSeries("payin", am5.p100, "right", -3, "#01678a");
+      createSeries("payout", 0, "left", 4, "#ea7e33");
+
+      // // Add cursor
+      // // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      // var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      //   behavior: "zoomY"
+      // }));
+      // cursor.lineY.set("forceHidden", true);
+      // cursor.lineX.set("forceHidden", true);
+
+      chart.root._logo.dispose();
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+    }
+    {
+      // ##################        STACKED AREA         ###################
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = container.children.push(am5xy.XYChart.new(root, {
+        width: am5.p50,
+        height: am5.p100,
+        panX: true,
+        panY: false,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        paddingLeft: 0
+      }));
+
+      // Set plot container background color
+      chart.plotContainer.set("background", am5.Rectangle.new(root, {
+        fill: am5.color("#fff") // Set the grid background color here
+      }));
+
+      // Add cursor
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      // var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      //   behavior: "none"
+      // }));
+      // cursor.lineY.set("visible", false);
+
+
+      // The data
+      var data = getData(1);
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: "date",
+        startLocation: 0.5,
+        endLocation: 0.5,
+        renderer: am5xy.AxisRendererX.new(root, {
           minorGridEnabled: true,
+          minGridDistance: 100
+        }),
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      xAxis.data.setAll(data);
+
+      var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        max: data.reduce((acc, cur) => Math.max(acc, cur.payin + cur.payout), 0),
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {
+          opposite: true // Move y-axis to the right
+        })
+      }));
+
+      // Hide grid line when label is hidden
+      xAxis.get("renderer").grid.template.adapters.add("visible", function (visible, target) {
+        var label = target.dataItem.get("label");
+        return label.isVisible();
+      });
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function createSeries(name, field, color) {
+        var series = chart.series.push(am5xy.LineSeries.new(root, {
+          name: name,
+          xAxis: xAxis,
+          yAxis: yAxis,
+          stacked: true,
+          fill: am5.color(color),
+          stroke: am5.color(color),
+          valueYField: field,
+          categoryXField: "date",
+          tooltip: am5.Tooltip.new(root, {
+            pointerOrientation: "horizontal",
+            labelText: "[bold]{name}[/]\n{categoryX}: {valueY}"
+          })
+        }));
+
+        series.fills.template.setAll({
+          fillOpacity: 0.3,
+          visible: true
         });
 
-        var xAxis = chart.xAxes.push(
-          am5xy.CategoryAxis.new(root, {
-            categoryField: "pair",
-            renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {}),
+        series.data.setAll(data);
+        series.appear(1000);
+      }
+
+      createSeries("payin", "payin", "#ea7e33");
+      createSeries("payout", "payout", "#01678a");
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+    }
+  }); // end am5.ready()
+
+  am5.ready(function () {
+
+
+    // Create root element
+    // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+    var root = am5.Root.new("chartdiv2");
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root.setThemes([
+      am5themes_Animated.new(root)
+    ]);
+
+    // Create wrapper for charts
+    var container = root.container.children.push(am5.Container.new(root, {
+      width: am5.p100,
+      height: am5.p100,
+      layout: root.horizontalLayout,
+    }));
+
+    {
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = container.children.push(
+        am5xy.XYChart.new(root, {
+          width: am5.p50,
+          height: am5.p100,
+          panX: true,
+          panY: false,
+          wheelX: "zoomX",
+          wheelY: "zoomX",
+          layout: root.verticalLayout,
+          arrangeTooltips: false,
+          paddingLeft: 0,
+          paddingRight: 40
+        })
+      );
+
+      // Set plot container background color
+      chart.plotContainer.set("background", am5.Rectangle.new(root, {
+        fill: am5.color("#fff") // Set the grid background color here
+      }));
+
+      // Use only absolute numbers
+      chart.getNumberFormatter().set("numberFormat", "#.#s");
+
+      // Add legend
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+      var legend = chart.children.push(
+        am5.Legend.new(root, {
+          centerX: am5.p50,
+          x: am5.p50
+        })
+      );
+
+      // Data
+      var data = getData().reverse();
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var yAxis = chart.yAxes.push(
+        am5xy.CategoryAxis.new(root, {
+          categoryField: "range",
+          renderer: am5xy.AxisRendererY.new(root, {
+            inversed: true,
+            cellStartLocation: 0.1,
+            cellEndLocation: 0.9,
+            minorGridEnabled: true,
+            minGridDistance: 20
+          }),
+          paddingRight: 10 // Add padding to the right here
+        })
+      );
+
+      yAxis.get("renderer").labels.template.setAll({
+        fontSize: "14px", // Set the font size here
+        fill: am5.color("#606060") // Set the label color here
+      });
+
+      yAxis.data.setAll(data);
+
+      var xAxis = chart.xAxes.push(
+        am5xy.ValueAxis.new(root, {
+          renderer: am5xy.AxisRendererX.new(root, {
+            minGridDistance: 60,
+            strokeOpacity: 0.1
+          })
+        })
+      );
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function createSeries(field, labelCenterX, pointerOrientation, rangeValue, color = "#ea7e33") {
+        var series = chart.series.push(
+          am5xy.ColumnSeries.new(root, {
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueXField: field,
+            categoryYField: "range",
+            sequencedInterpolation: true,
+            clustered: false,
+            fill: am5.color(color),
           })
         );
 
-        xRenderer.grid.template.setAll({
-          location: 1,
+        series.columns.template.setAll({
+          height: am5.p100,
+          strokeOpacity: 0,
+          fillOpacity: 0.8
         });
 
-        xAxis.data.setAll(data);
-
-        (function rotateXAxesLabels() {
-          const xRenderer = xAxis.get("renderer");
-          xRenderer.set("minGridDistance", 20); // set minimum distance to make labels visible
-          xRenderer.labels.template.setAll({
-            rotation: 90,
-            centerY: am5.p50,
-          });
-        })();
-
-        var yAxis = chart.yAxes.push(
-          am5xy.ValueAxis.new(root, {
-            min: 0,
-            max: 2500000, // Set maximum value to stabilize height during zoom operations
-            renderer: am5xy.AxisRendererY.new(root, {
-              strokeOpacity: 0.1,
-            }),
-          })
-        );
-
-        function addAxisTitle() {
-          yAxis.children.unshift(
-            am5.Label.new(root, {
-              text: "(Lot)",
-              y: -40,
-              x: am5.percent(50),
+        series.bullets.push(function () {
+          return am5.Bullet.new(root, {
+            locationX: 1,
+            locationY: 0.5,
+            sprite: am5.Label.new(root, {
+              centerY: am5.p50,
+              text: "{valueX}",
+              populateText: true,
+              centerX: labelCenterX
             })
-          );
-        }
-
-        addAxisTitle();
-
-        // Add series
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-        function makeSeries(name, fieldName, color = 0x2a3f54, stacked = true) {
-          var series = chart.series.push(
-            am5xy.ColumnSeries.new(root, {
-              stacked: stacked,
-              name: name,
-              xAxis: xAxis,
-              yAxis: yAxis,
-              fill: am5.color(color),
-              valueYField: fieldName,
-              categoryXField: "pair",
-            })
-          );
-
-          series.columns.template.setAll({
-            tooltipText: "{categoryX}: {name}, {valueY} Lot",
-            width: am5.percent(90),
-            tooltipY: am5.percent(10),
           });
-          series.data.setAll(data);
-
-          // Make stuff animate on load
-          // https://www.amcharts.com/docs/v5/concepts/animations/
-          series.appear();
-
-          // bullets: the values ​​display in the columns
-          //   series.bullets.push(function () {
-          //     return am5.Bullet.new(root, {
-          //       locationY: 0.5,
-          //       sprite: am5.Label.new(root, {
-          //         text: "{valueY}",
-          //         fill: root.interfaceColors.get("alternativeText"),
-          //         centerY: am5.percent(50),
-          //         centerX: am5.percent(50),
-          //         populateText: true,
-          //       }),
-          //     });
-          //   });
-
-          legend.data.push(series);
-        }
-
-        makeSeries("Long", "long", 0x88a6c4);
-        makeSeries("Short", "short");
-
-        function addScrollBar() {
-          // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-          const scrollbarX = am5.Scrollbar.new(root, {
-            orientation: "horizontal",
-          });
-
-          chart.set("scrollbarX", scrollbarX);
-          chart.bottomAxesContainer.children.push(scrollbarX);
-        }
-
-        function customScrollbar() {
-          let scrollbarX = chart.get("scrollbarX");
-
-          scrollbarX.thumb.setAll({
-            fill: am5.color(0xe5e5e5),
-          });
-
-          scrollbarX.startGrip.setAll({
-            visible: false,
-          });
-
-          scrollbarX.endGrip.setAll({
-            visible: false,
-          });
-        }
-
-        addScrollBar();
-        customScrollbar();
-
-        // =================================================================
-
-        // =================================================================
-
-        // Make stuff animate on load
-        // https://www.amcharts.com/docs/v5/concepts/animations/
-        chart.appear(1000, 100);
-      }); // end am5.ready()
-    </script>
-    <script>
-      am5.ready(function () {
-        // Create root element
-        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-        var root = am5.Root.new("chartdiv2");
-
-        // Set themes
-        // https://www.amcharts.com/docs/v5/concepts/themes/
-        root.setThemes([am5themes_Animated.new(root)]);
-
-        // Create chart
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/
-        var chart = root.container.children.push(
-          am5xy.XYChart.new(root, {
-            panX: true,
-            panY: false,
-            wheelX: "panX",
-            wheelY: "zoomX",
-            paddingTop: 50,
-            paddingLeft: 0,
-            layout: root.verticalLayout,
-          })
-        );
-
-        chart.root._logo.dispose(); // remove AmCharts logo
-
-        window.chart = chart;
-
-        // Add legend
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-        var legend = chart.children.push(
-          am5.Legend.new(root, {
-            centerX: am5.p50,
-            x: am5.p50,
-            y: 0,
-            clickTarget: "none", //disable toggling
-          })
-        );
-        const generateSampleDate = (index) => {
-          // Generate a day and month based on the index for variety
-          function indexToDate(index, year) {
-            // Create a date object starting from January 1 of the specified year
-            let date = new Date(year, 0, 1);
-            // Add the index as days to that date
-            date.setDate(date.getDate() + index);
-
-            // Format the output as DD/MM
-            let day = String(date.getDate()).padStart(2, "0");
-            let month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-
-            return `${day}/${month}`;
-          }
-
-          return indexToDate(index, 2024);
-        };
-        var data = [
-          { short: 300000, long: 400000 },
-          { short: 300000, long: 400000 },
-          { short: 700000, long: 1000000 },
-          { short: 700000, long: 1000000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 700000, long: 900000 },
-          { short: 700000, long: 900000 },
-          { short: 500000, long: 900000 },
-          { short: 900000, long: 300000 },
-          { short: 500000, long: 100000 },
-          { short: 500000, long: 100000 },
-          { short: 500000, long: 900000 },
-          { short: 500000, long: 900000 },
-          { short: 900000, long: 400000 },
-          { short: 900000, long: 400000 },
-          { short: 500000, long: 100000 },
-          { short: 500000, long: 100000 },
-          { short: 200000, long: 500000 },
-          { short: 300000, long: 800000 },
-          { short: 200000, long: 500000 },
-          { short: 700000, long: 800000 },
-          { short: 700000, long: 800000 },
-          { short: 100000, long: 400000 },
-          { short: 100000, long: 400000 },
-          { short: 900000, long: 400000 },
-          { short: 900000, long: 400000 },
-          { short: 500000, long: 100000 },
-          { short: 500000, long: 100000 },
-          { short: 400000, long: 300000 },
-          { short: 700000, long: 100000 },
-          { short: 200000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 100000, long: 900000 },
-          { short: 100000, long: 900000 },
-          { short: 800000, long: 700000 },
-          { short: 900000, long: 300000 },
-          { short: 800000, long: 700000 },
-          { short: 800000, long: 700000 },
-          { short: 600000, long: 200000 },
-          { short: 600000, long: 200000 },
-          { short: 700000, long: 400000 },
-          { short: 700000, long: 400000 },
-          { short: 800000, long: 300000 },
-          { short: 800000, long: 300000 },
-          { short: 900000, long: 500000 },
-          { short: 900000, long: 500000 },
-          { short: 100000, long: 900000 },
-          { short: 100000, long: 900000 },
-          { short: 800000, long: 700000 },
-          { short: 800000, long: 700000 },
-          { short: 600000, long: 800000 },
-          { short: 600000, long: 800000 },
-          { short: 100000, long: 500000 },
-          { short: 100000, long: 500000 },
-          { short: 300000, long: 400000 },
-          { short: 300000, long: 400000 },
-          { short: 100000, long: 100000 },
-          { short: 100000, long: 100000 },
-          { short: 200000, long: 900000 },
-          { short: 200000, long: 900000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 700000, long: 900000 },
-          { short: 700000, long: 900000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 600000, long: 300000 },
-          { short: 600000, long: 300000 },
-          { short: 400000, long: 300000 },
-          { short: 400000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 500000, long: 600000 },
-          { short: 500000, long: 600000 },
-          { short: 500000, long: 100000 },
-          { short: 500000, long: 100000 },
-          { short: 400000, long: 300000 },
-          { short: 400000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 400000, long: 500000 },
-          { short: 700000, long: 900000 },
-          { short: 700000, long: 900000 },
-          { short: 800000, long: 500000 },
-          { short: 800000, long: 500000 },
-          { short: 200000, long: 800000 },
-          { short: 200000, long: 800000 },
-          { short: 400000, long: 300000 },
-          { short: 400000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 200000, long: 300000 },
-          { short: 100000, long: 900000 },
-          { short: 300000, long: 900000 },
-          { short: 300000, long: 400000 },
-          { short: 300000, long: 400000 },
-          { short: 200000, long: 600000 },
-          { short: 200000, long: 600000 },
-          { short: 100000, long: 600000 },
-          { short: 100000, long: 600000 },
-          { short: 700000, long: 800000 },
-          { short: 700000, long: 800000 },
-          { short: 100000, long: 500000 },
-          { short: 100000, long: 500000 },
-          { short: 300000, long: 400000 },
-          { short: 900000, long: 200000 },
-          { short: 900000, long: 600000 },
-          { short: 900000, long: 600000 },
-          { short: 900000, long: 500000 },
-          { short: 900000, long: 500000 },
-          { short: 100000, long: 900000 },
-          { short: 100000, long: 900000 },
-          { short: 800000, long: 700000 },
-          { short: 800000, long: 700000 },
-          { short: 600000, long: 200000 },
-          { short: 600000, long: 400000 },
-          { short: 800000, long: 500000 },
-          { short: 800000, long: 500000 },
-          { short: 400000, long: 600000 },
-          { short: 400000, long: 600000 },
-          { short: 500000, long: 700000 },
-          { short: 100000, long: 500000 },
-          { short: 100000, long: 500000 },
-          { short: 300000, long: 400000 },
-          { short: 300000, long: 400000 },
-          { short: 200000, long: 600000 },
-          { short: 500000, long: 400000 },
-          { short: 600000, long: 200000 },
-          { short: 600000, long: 200000 },
-          { short: 900000, long: 400000 },
-          { short: 900000, long: 400000 },
-          { short: 500000, long: 100000 },
-          { short: 700000, long: 300000 },
-          { short: 400000, long: 900000 },
-          { short: 400000, long: 900000 },
-          { short: 700000, long: 800000 },
-          { short: 700000, long: 800000 },
-          { short: 100000, long: 500000 },
-          { short: 100000, long: 500000 },
-          { short: 100000, long: 700000 },
-          { short: 300000, long: 200000 },
-          { short: 100000, long: 200000 },
-          { short: 100000, long: 200000 },
-          { short: 800000, long: 500000 },
-          { short: 800000, long: 500000 },
-          { short: 400000, long: 600000 },
-          { short: 400000, long: 600000 },
-          { short: 400000, long: 100000 },
-          { short: 400000, long: 100000 },
-          { short: 800000, long: 600000 },
-          { short: 800000, long: 600000 },
-          { short: 600000, long: 200000 },
-          { short: 600000, long: 200000 },
-          { short: 900000, long: 400000 },
-          { short: 900000, long: 400000 },
-          { short: 1000000, long: 700000 },
-          { short: 1000000, long: 700000 },
-          { short: 400000, long: 600000 },
-          { short: 400000, long: 600000 },
-          { short: 700000, long: 800000 },
-          { short: 700000, long: 800000 },
-          { short: 100000, long: 500000 },
-          { short: 800000, long: 600000 },
-        ];
-        data = [...data, ...data]
-          .map((entry, index) => {
-            return {
-              date: generateSampleDate(index),
-              short: entry.short,
-              long: entry.long,
-            };
-          })
-          .sort((a, b) => {
-            const [dayA, monthA] = a.date.split("/").map(Number);
-            const [dayB, monthB] = b.date.split("/").map(Number);
-            return monthA - monthB || dayA - dayB;
-          });
-
-        const uniqueData = [];
-        const datesSet = new Set();
-
-        data.forEach((entry) => {
-          if (!datesSet.has(entry.date)) {
-            datesSet.add(entry.date);
-            uniqueData.push(entry);
-          }
         });
 
-        data = [...uniqueData];
-        console.log(data.length);
+        series.data.setAll(data);
+        series.appear();
 
-        // Create axes
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-        var xRenderer = am5xy.AxisRendererX.new(root, {
-          cellStartLocation: 0.2,
-          cellEndLocation: 0.8,
+        var rangeDataItem = xAxis.makeDataItem({
+          value: rangeValue
+        });
+        xAxis.createAxisRange(rangeDataItem);
+        rangeDataItem.get("grid").setAll({
+          strokeOpacity: 1,
+          stroke: series.get("stroke")
+        });
+
+        return series;
+      }
+
+      createSeries("payin", am5.p100, "right", -3, "#01678a");
+      createSeries("payout", 0, "left", 4, "#ea7e33");
+
+      // // Add cursor
+      // // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      // var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      //   behavior: "zoomY"
+      // }));
+      // cursor.lineY.set("forceHidden", true);
+      // cursor.lineX.set("forceHidden", true);
+
+      chart.root._logo.dispose();
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+    }
+    {
+      // ##################        STACKED AREA         ###################
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      var chart = container.children.push(am5xy.XYChart.new(root, {
+        width: am5.p50,
+        height: am5.p100,
+        panX: true,
+        panY: false,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        pinchZoomX: true,
+        paddingLeft: 0
+      }));
+
+      // Set plot container background color
+      chart.plotContainer.set("background", am5.Rectangle.new(root, {
+        fill: am5.color("#fff") // Set the grid background color here
+      }));
+
+      // Add cursor
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      // var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      //   behavior: "none"
+      // }));
+      // cursor.lineY.set("visible", false);
+
+
+      // The data
+      var data = getData(1);
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+        categoryField: "date",
+        startLocation: 0.5,
+        endLocation: 0.5,
+        renderer: am5xy.AxisRendererX.new(root, {
           minorGridEnabled: true,
+          minGridDistance: 100
+        }),
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      xAxis.data.setAll(data);
+
+      var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        max: data.reduce((acc, cur) => Math.max(acc, cur.payin, cur.payout), 0),
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {
+          opposite: true // Move y-axis to the right
+        })
+      }));
+
+      // Hide grid line when label is hidden
+      xAxis.get("renderer").grid.template.adapters.add("visible", function (visible, target) {
+        var label = target.dataItem.get("label");
+        return label.isVisible();
+      });
+
+      // Add series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      function createSeries(name, field, color) {
+        var series = chart.series.push(am5xy.LineSeries.new(root, {
+          name: name,
+          xAxis: xAxis,
+          yAxis: yAxis,
+          stacked: false,
+          fill: am5.color(color),
+          stroke: am5.color(color),
+          valueYField: field,
+          categoryXField: "date",
+          tooltip: am5.Tooltip.new(root, {
+            pointerOrientation: "horizontal",
+            labelText: "[bold]{name}[/]\n{categoryX}: {valueY}"
+          })
+        }));
+
+        series.fills.template.setAll({
+          fillOpacity: 0.3,
+          visible: true
         });
 
-        var xAxis = chart.xAxes.push(
-          am5xy.CategoryAxis.new(root, {
-            categoryField: "date",
-            renderer: xRenderer,
-            tooltip: am5.Tooltip.new(root, {}),
-          })
-        );
+        series.data.setAll(data);
+        series.appear(1000);
+      }
 
-        xRenderer.grid.template.setAll({
-          location: 1,
+      createSeries("payout", "payout", "#01678a");
+      createSeries("payin", "payin", "#ea7e33");
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      chart.appear(1000, 100);
+    }
+  }); // end am5.ready()
+
+  function getData(sign = -1) {
+    if (sign > 0) {
+      var chartData = [];
+      // current date
+
+      let payin = 10
+      let payout = 10
+
+      for (var i = 0; i < 20; i++) {
+        var newDate = new Date();
+        // each time we add one minute
+        newDate.setDate(newDate.getDate() + i);
+        // add data item to the array
+        chartData.push({
+          date: newDate.toDateString().split(" ").splice(1, 2).join('/'),
+          payin: payin += Math.round(Math.random() * 15),
+          payout: payout += Math.round(Math.random() * 15)
         });
+      }
+      return chartData;
+    }
 
-        xAxis.data.setAll(data);
+    return [
+      {
+        range: "-500",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Jan/25"
+      },
+      {
+        range: "500-999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Feb/25"
+      },
+      {
+        range: "1000-1999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Mar/25"
+      },
+      {
+        range: "2000-2999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Apr/25"
+      },
+      {
+        range: "3000-3999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "May/25"
+      },
+      {
+        range: "4000-4999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Jun/25"
+      },
+      {
+        range: "5000-5999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Jul/25"
+      },
+      {
+        range: "6000-6999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Aug/25"
+      },
+      {
+        range: "7000-7999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Sep/25"
+      },
+      {
+        range: "8000-8999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Oct/25"
+      },
+      {
+        range: "9000-9999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Nov/25"
+      },
+      {
+        range: "10k-29999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Dec/25"
+      },
+      {
+        range: "30k-49999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Jan/26"
+      },
+      {
+        range: "50k-99999",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Feb/26"
+      },
+      {
+        range: "100k-",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Mar/26"
+      },
+      {
+        range: "200k",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Apr/26"
+      },
+      {
+        range: "300k",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "May/26"
+      },
+      {
+        range: "500k",
+        payin: sign * Math.round(Math.random() * 30),
+        payout: Math.max(Math.round(Math.random() * 30), 20),
+        date: "Jun/26"
+      }
+    ];
+  }
+</script>
 
-        (function rotateXAxesLabels() {
-          const xRenderer = xAxis.get("renderer");
-          // xRenderer.set("minGridDistance", 20); // set minimum distance to make labels visible
-          xRenderer.labels.template.setAll({
-            rotation: 0,
-            centerY: am5.p50,
-          });
-        })();
+<!-- HTML -->
+<div class="cluster-wrapper">
+  <div id="cluster"></div>
+</div>
 
-        var yAxis = chart.yAxes.push(
-          am5xy.ValueAxis.new(root, {
-            min: 0,
-            max: 2500000, // Set maximum value to stabilize height during zoom operations
-            renderer: am5xy.AxisRendererY.new(root, {
-              strokeOpacity: 0.1,
-            }),
-          })
-        );
+<div class="cluster-wrapper">
+  <div id="cluster-detail"></div>
+</div>
 
-        function addAxisTitle() {
-          yAxis.children.unshift(
-            am5.Label.new(root, {
-              text: "(Lot)",
-              y: -40,
-              x: am5.percent(50),
-            })
-          );
-        }
 
-        // addAxisTitle();
+<div class="wrapper">
+  <div id="chartdiv"></div>
+</div>
 
-        // Add series
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-        function makeSeries(name, fieldName, color = 0x2a3f54, stacked = true) {
-          var series = chart.series.push(
-            am5xy.ColumnSeries.new(root, {
-              stacked: stacked,
-              name: name,
-              xAxis: xAxis,
-              yAxis: yAxis,
-              fill: am5.color(color),
-              valueYField: fieldName,
-              categoryXField: "date",
-            })
-          );
-
-          series.columns.template.setAll({
-            tooltipText: "{categoryX}: {name}, {valueY}",
-            width: am5.percent(90),
-            tooltipY: am5.percent(10),
-          });
-          series.data.setAll(data);
-
-          // Make stuff animate on load
-          // https://www.amcharts.com/docs/v5/concepts/animations/
-          series.appear();
-
-          // bullets: the values ​​display in the columns
-          //   series.bullets.push(function () {
-          //     return am5.Bullet.new(root, {
-          //       locationY: 0.5,
-          //       sprite: am5.Label.new(root, {
-          //         text: "{valueY}",
-          //         fill: root.interfaceColors.get("alternativeText"),
-          //         centerY: am5.percent(50),
-          //         centerX: am5.percent(50),
-          //         populateText: true,
-          //       }),
-          //     });
-          //   });
-
-          legend.data.push(series);
-        }
-
-        makeSeries("New", "long", 0x88a6c4);
-        makeSeries("Additional", "short");
-
-        function addScrollBar() {
-          // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-          const scrollbarX = am5.Scrollbar.new(root, {
-            orientation: "horizontal",
-          });
-
-          chart.set("scrollbarX", scrollbarX);
-          chart.bottomAxesContainer.children.push(scrollbarX);
-        }
-
-        function customScrollbar() {
-          let scrollbarX = chart.get("scrollbarX");
-
-          scrollbarX.thumb.setAll({
-            fill: am5.color(0xe5e5e5),
-          });
-
-          scrollbarX.startGrip.setAll({
-            visible: false,
-          });
-
-          scrollbarX.endGrip.setAll({
-            visible: false,
-          });
-        }
-
-        addScrollBar();
-        customScrollbar();
-
-        // =================================================================
-
-        // =================================================================
-
-        // Make stuff animate on load
-        // https://www.amcharts.com/docs/v5/concepts/animations/
-        chart.appear(1000, 100);
-      }); // end am5.ready()
-    </script></head
-  ><!-- Styles -->
-
-  <!-- Resources -->
-
-  <!-- Chart code -->
-
-  <!-- Chart code 2 -->
-
-  <!-- HTML -->
-  <body>
-    <div id="chartdiv" style="max-width: 70vw; margin: auto"></div>
-    <div
-      id="chartdiv2"
-      style="max-width: 70vw; max-height: 40vh; margin: auto"
-    ></div>
-  </body>
-</html>
+<!-- HTML -->
+<div class="wrapper">
+  <div id="chartdiv2"></div>
+</div>
